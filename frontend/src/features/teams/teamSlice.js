@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchMyTeams } from "./teamsAPI";
+import { fetchMyTeams, fetchTeamById } from "./teamsAPI";
 
 export const fetchMyTeamsThunk = createAsyncThunk(
   "team/fetchMyTeams",
@@ -10,6 +10,20 @@ export const fetchMyTeamsThunk = createAsyncThunk(
     } catch (err) {
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || "Failed to fetch teams"
+      );
+    }
+  }
+);
+
+export const fetchTeamByIdThunk = createAsyncThunk(
+  "team/fetchTeamById",
+  async ({ token, teamId }, thunkAPI) => {
+    try {
+      const team = await fetchTeamById(token, teamId);
+      return team;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to load team"
       );
     }
   }
@@ -48,6 +62,10 @@ const teamSlice = createSlice({
       .addCase(fetchMyTeamsThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchTeamByIdThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentTeam = action.payload;
       });
   },
 });

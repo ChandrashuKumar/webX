@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { createTeam } from "./teamsAPI";
 import { toast } from "react-toastify";
@@ -6,33 +6,7 @@ import { toast } from "react-toastify";
 export default function CreateTeamModal({ onClose, onSuccess }) {
   const { token, user } = useSelector((state) => state.auth);
   const [teamName, setTeamName] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState([user]); // include self by default
-  const [allUsers, setAllUsers] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        setAllUsers(data);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-      }
-    };
-    fetchUsers();
-  }, [token]);
-
-  const handleToggleMember = (member) => {
-    if (selectedMembers.find((m) => m._id === member._id)) {
-      setSelectedMembers(selectedMembers.filter((m) => m._id !== member._id));
-    } else {
-      setSelectedMembers([...selectedMembers, member]);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +15,7 @@ export default function CreateTeamModal({ onClose, onSuccess }) {
     try {
       const teamData = {
         name: teamName,
-        members: selectedMembers.map((m) => m._id),
+        members: user._id,
       };
       const created = await createTeam(token, teamData);
       toast.success(`Team "${created.name}" created`);
@@ -52,9 +26,6 @@ export default function CreateTeamModal({ onClose, onSuccess }) {
       toast.error(err.response?.data?.message || "Failed to create team");
     }
   };
-
-  // Combine current user with other users (remove duplicates)
-  const members = [user, ...allUsers.filter((u) => u._id !== user._id)];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
@@ -72,7 +43,7 @@ export default function CreateTeamModal({ onClose, onSuccess }) {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium mb-1">
               Add Members *
             </label>
@@ -102,7 +73,7 @@ export default function CreateTeamModal({ onClose, onSuccess }) {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="flex justify-end space-x-3 mt-4">
             <button

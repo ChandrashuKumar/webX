@@ -58,3 +58,27 @@ exports.getMyTeams = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Get a specific team with populated members
+exports.getTeamById = async (req, res) => {
+  const { teamId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const team = await Team.findById(teamId)
+      .populate('admin', 'name email')
+      .populate('members', 'name email');
+
+    if (!team) {
+      return res.status(404).json({ message: 'Team not found' });
+    }
+
+    if (!team.members.some(member => member._id.toString() === userId)) {
+      return res.status(403).json({ message: 'Not a member of this team' });
+    }
+
+    res.json(team);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { setCurrentTeam, fetchMyTeamsThunk } from './teamSlice';
 
-export default function TeamSidebar({ onCreateClick, onAddPeopleClick }) {
+export default function TeamSidebar({ onCreateClick}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { token, user } = useSelector((state) => state.auth);
   const { teams, currentTeam } = useSelector((state) => state.team);
@@ -50,15 +52,6 @@ export default function TeamSidebar({ onCreateClick, onAddPeopleClick }) {
             <div className="absolute right-0 mt-2 w-40 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10">
               <button
                 onClick={() => {
-                  onAddPeopleClick();
-                  setDropdownOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm"
-              >
-                Invite people
-              </button>
-              <button
-                onClick={() => {
                   onCreateClick();
                   setDropdownOpen(false);
                 }}
@@ -76,7 +69,10 @@ export default function TeamSidebar({ onCreateClick, onAddPeopleClick }) {
         {teams.map((team) => (
           <div
             key={team._id}
-            onClick={() => dispatch(setCurrentTeam(team))}
+            onClick={() => {
+              dispatch(setCurrentTeam(team));
+              navigate(`/teams/${team._id}`);
+            }}
             className={`px-3 py-2 rounded-md cursor-pointer transition text-sm font-medium ${
               currentTeam?._id === team._id
                 ? 'bg-blue-600'

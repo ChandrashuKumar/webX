@@ -8,6 +8,7 @@ import GuestRoute from './components/GuestRoute';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import ProtectedLayout from './layouts/ProtectedLayout';
+import TeamDetails from './features/teams/TeamDetails';
 import './App.css';
 
 function App() {
@@ -42,6 +43,17 @@ function App() {
             <PrivateRoute>
               <ProtectedLayout>
                 <Dashboard />
+              </ProtectedLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/teams/:teamId"
+          element={
+            <PrivateRoute>
+              <ProtectedLayout>
+                <TeamDetails />
               </ProtectedLayout>
             </PrivateRoute>
           }

@@ -19,3 +19,12 @@ export const createTeam = async (token, teamData) => {
   });
   return res.data;
 };
+
+export const fetchTeamById = async (token, teamId) => {
+  const res = await axios.get(`${BASE_URL}/teams/${teamId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
