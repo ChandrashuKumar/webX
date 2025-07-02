@@ -9,7 +9,17 @@ const taskRoutes = require('./routes/taskRoutes');
 const { authenticate } = require('./middleware/authMiddleware');
 
 const app = express();
-app.use(cors());
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://web-x-chi.vercel.app/'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
