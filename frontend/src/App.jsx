@@ -6,10 +6,9 @@ import Login from './features/auth/Login';
 import PrivateRoute from './components/PrivateRoute';
 import GuestRoute from './components/GuestRoute';
 import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
+import ProtectedLayout from './layouts/ProtectedLayout';
 import './App.css';
-
-// Placeholder dashboard
-const Dashboard = () => <div className="text-white p-4">Dashboard (Protected)</div>;
 
 function App() {
   const token = useSelector((state) => state.auth.token);
@@ -17,10 +16,8 @@ function App() {
   return (
     <div className="app-container bg-gray-900 min-h-screen">
       <Routes>
-        {/* Landing page */}
         <Route path="/" element={<Landing />} />
 
-        {/* Only for guests (unauthenticated users) */}
         <Route
           path="/signup"
           element={
@@ -38,17 +35,20 @@ function App() {
           }
         />
 
-        {/* Authenticated only */}
+        {/* Protected layout wrapping all internal pages */}
         <Route
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <ProtectedLayout>
+                <Dashboard />
+              </ProtectedLayout>
             </PrivateRoute>
           }
         />
 
-        {/* Catch-all redirect */}
+        {/* Add more protected pages inside ProtectedLayout later */}
+
         <Route
           path="*"
           element={<Navigate to={token ? "/dashboard" : "/"} />}
