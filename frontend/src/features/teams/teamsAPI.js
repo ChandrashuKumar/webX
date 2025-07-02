@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const fetchMyTeams = async (token) => {
@@ -27,4 +26,24 @@ export const fetchTeamById = async (token, teamId) => {
     },
   });
   return res.data;
+};
+
+export const addMemberToTeam = async (token, teamId, email) => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/teams/${teamId}/add-member`,
+      { email },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    const message = err.response?.data?.message || err.message || "Failed to add member";
+    //console.log(message);
+    
+    throw message;
+  }
 };

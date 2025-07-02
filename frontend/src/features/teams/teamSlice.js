@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchMyTeams, fetchTeamById } from "./teamsAPI";
+import { fetchMyTeams, fetchTeamById, addMemberToTeam } from "./teamsAPI";
 
 export const fetchMyTeamsThunk = createAsyncThunk(
   "team/fetchMyTeams",
@@ -25,6 +25,18 @@ export const fetchTeamByIdThunk = createAsyncThunk(
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || "Failed to load team"
       );
+    }
+  }
+);
+
+export const addMemberThunk = createAsyncThunk(
+  'team/addMember',
+  async ({ token, teamId, email }, thunkAPI) => {
+    try {
+      const data = await addMemberToTeam(token, teamId, email);
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err || 'Failed to add member');
     }
   }
 );

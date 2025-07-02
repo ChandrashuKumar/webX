@@ -1,12 +1,14 @@
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector} from "react-redux";
 import { useDispatch } from "react-redux";
 import { fetchTeamByIdThunk } from "./teamSlice";
+import AddPeopleModal from "./AddPeopleModal";
 
 export default function TeamDetails() {
   const currentTeam = useSelector((state) => state.team.currentTeam);
   const dispatch = useDispatch();
+  const [showAddModal, setShowAddModal] = useState(false);
   const { token } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -34,7 +36,8 @@ export default function TeamDetails() {
           </span>
           {currentTeam.name}
         </h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+        onClick={() => setShowAddModal(true)}>
           Add people
         </button>
       </div>
@@ -67,6 +70,7 @@ export default function TeamDetails() {
           Team activity section coming soon...
         </p>
       </div>
+      {showAddModal && <AddPeopleModal onClose={() => setShowAddModal(false)} />}
     </div>
   );
 }
