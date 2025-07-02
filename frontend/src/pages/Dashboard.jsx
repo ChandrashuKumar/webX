@@ -6,7 +6,6 @@ import CreateTaskModal from "../features/tasks/CreateTaskModal";
 import TaskCard from "../features/tasks/TaskCard";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { toast } from "react-toastify";
 
 const FILTERS = [
   "All",
@@ -71,18 +70,6 @@ function Dashboard() {
     }
   });
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case "High":
-        return "bg-red-500";
-      case "Medium":
-        return "bg-yellow-500";
-      case "Low":
-        return "bg-green-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
 
   if (!currentTeam)
     return <p className="text-white p-4">No team selected</p>;
