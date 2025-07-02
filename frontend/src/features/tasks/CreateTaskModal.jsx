@@ -18,7 +18,7 @@ const schema = z.object({
   labels: z.string().optional(),
 });
 
-export default function CreateTaskModal({ onClose }) {
+export default function CreateTaskModal({ onClose, onSuccess }) {
   const { token, user } = useSelector((state) => state.auth);
 
   const { currentTeam } = useSelector((state) => state.team);
@@ -61,6 +61,7 @@ export default function CreateTaskModal({ onClose }) {
       await dispatch(createTaskThunk({ token, taskData })).unwrap();
       toast.success("Task created!");
       reset();
+      onSuccess?.();
       onClose();
     } catch (err) {
       toast.error(err);
