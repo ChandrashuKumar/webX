@@ -10,3 +10,12 @@ export const fetchMyTeams = async (token) => {
   });
   return res.data;
 };
+
+export const createTeam = async (token, teamData) => {
+  const res = await axios.post(`${BASE_URL}/teams/create`, teamData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

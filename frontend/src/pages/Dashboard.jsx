@@ -1,10 +1,11 @@
-import React from 'react';
 
 export default function Dashboard() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <p>Welcome to your team dashboard. Here you’ll manage your tasks and team.</p>
+    <div className="flex h-screen">
+      {/* Placeholder content for now */}
+      <div className="flex-1 text-white p-8">
+        <h1 className="text-2xl font-bold">Welcome to your dashboard</h1>
+      </div>
     </div>
   );
 }
