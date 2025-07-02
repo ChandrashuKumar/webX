@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import TeamSidebar from '../features/teams/TeamSideBar';
 import CreateTeamModal from '../features/teams/CreateTeamModal';
 import { fetchMyTeamsThunk } from '../features/teams/teamSlice';
+import { ToastContainer } from 'react-toastify';
 
 export default function ProtectedLayout({ children }) {
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
@@ -18,6 +19,7 @@ export default function ProtectedLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white">
+      <ToastContainer theme="dark" />
       {/* Sidebar */}
       <TeamSidebar
         onCreateClick={() => setShowCreateTeamModal(true)}

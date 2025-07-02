@@ -71,7 +71,7 @@ export default function TeamSidebar({ onCreateClick}) {
             key={team._id}
             onClick={() => {
               dispatch(setCurrentTeam(team));
-              navigate(`/teams/${team._id}`);
+              navigate('/dashboard');
             }}
             className={`px-3 py-2 rounded-md cursor-pointer transition text-sm font-medium ${
               currentTeam?._id === team._id
