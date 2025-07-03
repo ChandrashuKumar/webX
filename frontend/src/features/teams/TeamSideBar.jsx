@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { setCurrentTeam, fetchMyTeamsThunk } from './teamSlice';
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setCurrentTeam, fetchMyTeamsThunk } from "./teamSlice";
+import { fetchTasksByTeamThunk } from "../tasks/taskSlice";
 
-export default function TeamSidebar({ onCreateClick}) {
+export default function TeamSidebar({ onCreateClick }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
@@ -24,8 +25,8 @@ export default function TeamSidebar({ onCreateClick}) {
         setDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -71,12 +72,18 @@ export default function TeamSidebar({ onCreateClick}) {
             key={team._id}
             onClick={() => {
               dispatch(setCurrentTeam(team));
-              navigate('/dashboard');
+              dispatch(
+                fetchTasksByTeamThunk({
+                  token,
+                  teamId: team._id,
+                })
+              );
+              navigate("/dashboard");
             }}
             className={`px-3 py-2 rounded-md cursor-pointer transition text-sm font-medium ${
               currentTeam?._id === team._id
-                ? 'bg-blue-600'
-                : 'bg-gray-800 hover:bg-gray-700'
+                ? "bg-blue-600"
+                : "bg-gray-800 hover:bg-gray-700"
             }`}
           >
             {team.name}

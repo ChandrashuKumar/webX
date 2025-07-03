@@ -6,6 +6,9 @@ import CreateTaskModal from "../features/tasks/CreateTaskModal";
 import TaskCard from "../features/tasks/TaskCard";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 
 const FILTERS = [
   "All",
@@ -19,7 +22,7 @@ const FILTERS = [
 
 function Dashboard() {
   const { currentTeam } = useSelector((state) => state.team);
-  const { tasks } = useSelector((state) => state.task);
+  const { tasks, loading } = useSelector((state) => state.task);
   const { user } = useSelector((state) => state.auth);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
@@ -73,6 +76,32 @@ function Dashboard() {
 
   if (!currentTeam)
     return <p className="text-white p-4">No team selected</p>;
+
+  if (loading) {
+  return (
+    <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <div className="flex-1 p-6 flex gap-6">
+        {[...Array(3)].map((_, colIdx) => (
+          <div key={colIdx} className="w-full sm:w-1/2 lg:w-1/3 space-y-4">
+            <Skeleton height={24} width="60%" baseColor="#313131" highlightColor="#525252" className="mb-4" />
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-gray-800 p-4 rounded-xl shadow">
+                <Skeleton height={20} width="80%" baseColor="#313131" highlightColor="#525252" />
+                <Skeleton height={14} width="100%" className="mt-2" baseColor="#313131" highlightColor="#525252" />
+                <Skeleton height={14} width="60%" baseColor="#313131" highlightColor="#525252" />
+                <div className="flex gap-2 mt-3">
+                  <Skeleton height={20} width={40} borderRadius={10} baseColor="#313131" highlightColor="#525252" />
+                  <Skeleton height={20} width={60} borderRadius={10} baseColor="#313131" highlightColor="#525252" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
   return (
     <DndProvider backend={HTML5Backend}>
