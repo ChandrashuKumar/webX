@@ -3,10 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCurrentTeam, fetchMyTeamsThunk } from "./teamSlice";
 import { fetchTasksByTeamThunk } from "../tasks/taskSlice";
+import { logout } from "../auth/authSlice";
 
 export default function TeamSidebar({ onCreateClick }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile sidebar toggle
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,6 +30,13 @@ export default function TeamSidebar({ onCreateClick }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("token");
+    navigate("/login");
+    setSidebarOpen(false);
+  };
 
   return (
     <>
@@ -91,7 +99,7 @@ export default function TeamSidebar({ onCreateClick }) {
         </div>
 
         {/* 📋 Team List */}
-        <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar">
+        <div className="space-y-2 mb-4 max-h-52 overflow-y-auto custom-scrollbar">
           {teams.map((team) => (
             <div
               key={team._id}
@@ -104,7 +112,7 @@ export default function TeamSidebar({ onCreateClick }) {
                   })
                 );
                 navigate("/dashboard");
-                setSidebarOpen(false); // close sidebar on mobile
+                setSidebarOpen(false);
               }}
               className={`px-3 py-2 rounded-md cursor-pointer transition text-sm font-medium ${
                 currentTeam?._id === team._id
@@ -116,6 +124,17 @@ export default function TeamSidebar({ onCreateClick }) {
             </div>
           ))}
         </div>
+
+        {/* 🔒 Logout Button - Visible without scrolling */}
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm"
+        >
+          Logout
+        </button>
+
+        {/* Flex-grow spacer to push bottom if more content is added */}
+        <div className="flex-grow" />
       </aside>
     </>
   );
