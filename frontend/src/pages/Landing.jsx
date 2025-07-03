@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Spotlight } from '@/components/ui/spotlight';
+import { Spotlight } from '@/components/ui/Spotlight';
 
 export default function Landing() {
   return (
