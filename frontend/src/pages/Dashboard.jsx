@@ -80,9 +80,9 @@ function Dashboard() {
   if (loading) {
     return (
       <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-        <div className="flex-1 p-6 flex gap-6">
+        <div className="flex-1 p-6 flex flex-col md:flex-row gap-6">
           {[...Array(3)].map((_, colIdx) => (
-            <div key={colIdx} className="w-full sm:w-1/2 lg:w-1/3 space-y-4">
+            <div key={colIdx} className="w-full md:w-1/2 lg:w-1/3 space-y-4">
               <Skeleton
                 height={24}
                 width="60%"
@@ -138,17 +138,17 @@ function Dashboard() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <div className="flex flex-col h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-950 sticky top-0 z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 py-4 border-b border-gray-800 bg-gray-950 sticky top-0 z-10 gap-2">
             <div>
               <h1 className="text-2xl font-extrabold tracking-tight">
                 {currentTeam.name}
               </h1>
               <p className="text-sm text-gray-400">Team dashboard</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm shadow-md"
@@ -165,7 +165,7 @@ function Dashboard() {
           </div>
 
           {/* Filters */}
-          <div className="px-6 py-2 bg-gray-950 border-b border-gray-800 flex flex-wrap gap-2 sticky top-[72px] z-10">
+          <div className="px-4 py-2 bg-gray-950 border-b border-gray-800 flex flex-wrap gap-2 sticky top-[72px] z-10">
             {FILTERS.map((f) => (
               <button
                 key={f}
@@ -182,7 +182,7 @@ function Dashboard() {
           </div>
 
           {/* Kanban Columns */}
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col lg:flex-row gap-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col lg:flex-row gap-4 custom-scrollbar">
             {["To Do", "In Progress", "Done"]
               .filter((status) =>
                 activeFilter === "All" || activeFilter === status
@@ -192,11 +192,11 @@ function Dashboard() {
               .map((status) => (
                 <div
                   key={status}
-                  className="w-full sm:w-1/2 lg:w-1/3 bg-gray-800 rounded-xl shadow-xl p-4 flex flex-col max-h-[80vh] overflow-y-auto custom-scrollbar"
+                  className="w-full md:w-1/2 lg:w-1/3 bg-gray-800 rounded-xl shadow-xl p-4 flex flex-col max-h-[80vh] overflow-y-auto custom-scrollbar"
                 >
                   <h2 className="text-lg font-bold mb-4 text-white border-b border-gray-600 pb-1">
-  {status} ({tasksByStatus[status].length})
-</h2>
+                    {status} ({tasksByStatus[status].length})
+                  </h2>
 
                   <div className="flex flex-col gap-4">
                     {tasksByStatus[status].length > 0 ? (
@@ -221,7 +221,6 @@ function Dashboard() {
         </div>
 
         {/* Modal */}
-        {/* Task Create/Edit Modal */}
         {(showCreateModal || taskToEdit) && (
           <CreateTaskModal
             taskToEdit={taskToEdit}
