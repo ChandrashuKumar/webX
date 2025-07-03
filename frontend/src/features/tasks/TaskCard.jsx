@@ -1,5 +1,4 @@
-// components/TaskCard.jsx
-export default function TaskCard({ task }) {
+export default function TaskCard({ task, onClick }) {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "High":
@@ -14,7 +13,8 @@ export default function TaskCard({ task }) {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-4 shadow-lg hover:bg-gray-700 cursor-pointer border border-gray-700 transition-transform duration-200">
+    <div onClick={onClick} 
+    className="bg-gray-800 rounded-xl p-4 shadow-lg hover:bg-gray-700 cursor-pointer border border-gray-700 transition-transform duration-200">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-bold text-white text-lg">{task.title}</h3>
         <span className={`text-xs px-2 py-1 rounded-full text-white ${getPriorityColor(task.priority)}`}>

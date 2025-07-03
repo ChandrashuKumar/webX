@@ -6,9 +6,8 @@ import CreateTaskModal from "../features/tasks/CreateTaskModal";
 import TaskCard from "../features/tasks/TaskCard";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const FILTERS = [
   "All",
@@ -26,20 +25,24 @@ function Dashboard() {
   const { user } = useSelector((state) => state.auth);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [taskToEdit, setTaskToEdit] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentTeam?._id) {
-      dispatch(
-        fetchTasksByTeamThunk({
-          token: localStorage.getItem("token"),
-          teamId: currentTeam._id,
-        })
-      );
-    }
-  }, [currentTeam, dispatch]);
+  if (currentTeam?._id && token) {
+    dispatch(
+      fetchTasksByTeamThunk({
+        token,
+        teamId: currentTeam._id,
+      })
+    );
+  }
+}, [currentTeam?._id, token, dispatch]);
+
 
   const isApproachingDeadline = (dueDate) => {
     if (!dueDate) return false;
@@ -53,8 +56,7 @@ function Dashboard() {
     if (activeFilter === "All") return true;
     if (activeFilter === "Deadline Approaching")
       return isApproachingDeadline(task.dueDate);
-    if (activeFilter === "Assigned to Me")
-      return task.assignee?._id === userId;
+    if (activeFilter === "Assigned to Me") return task.assignee?._id === userId;
     if (activeFilter === "Created by Me") return task.reporter?._id === userId;
     return task.status === activeFilter;
   };
@@ -64,7 +66,7 @@ function Dashboard() {
   const tasksByStatus = {
     "To Do": [],
     "In Progress": [],
-    "Done": [],
+    Done: [],
   };
 
   filteredTasks.forEach((task) => {
@@ -73,35 +75,66 @@ function Dashboard() {
     }
   });
 
-
-  if (!currentTeam)
-    return <p className="text-white p-4">No team selected</p>;
+  if (!currentTeam) return <p className="text-white p-4">No team selected</p>;
 
   if (loading) {
-  return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <div className="flex-1 p-6 flex gap-6">
-        {[...Array(3)].map((_, colIdx) => (
-          <div key={colIdx} className="w-full sm:w-1/2 lg:w-1/3 space-y-4">
-            <Skeleton height={24} width="60%" baseColor="#313131" highlightColor="#525252" className="mb-4" />
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-800 p-4 rounded-xl shadow">
-                <Skeleton height={20} width="80%" baseColor="#313131" highlightColor="#525252" />
-                <Skeleton height={14} width="100%" className="mt-2" baseColor="#313131" highlightColor="#525252" />
-                <Skeleton height={14} width="60%" baseColor="#313131" highlightColor="#525252" />
-                <div className="flex gap-2 mt-3">
-                  <Skeleton height={20} width={40} borderRadius={10} baseColor="#313131" highlightColor="#525252" />
-                  <Skeleton height={20} width={60} borderRadius={10} baseColor="#313131" highlightColor="#525252" />
+    return (
+      <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+        <div className="flex-1 p-6 flex gap-6">
+          {[...Array(3)].map((_, colIdx) => (
+            <div key={colIdx} className="w-full sm:w-1/2 lg:w-1/3 space-y-4">
+              <Skeleton
+                height={24}
+                width="60%"
+                baseColor="#313131"
+                highlightColor="#525252"
+                className="mb-4"
+              />
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-gray-800 p-4 rounded-xl shadow">
+                  <Skeleton
+                    height={20}
+                    width="80%"
+                    baseColor="#313131"
+                    highlightColor="#525252"
+                  />
+                  <Skeleton
+                    height={14}
+                    width="100%"
+                    className="mt-2"
+                    baseColor="#313131"
+                    highlightColor="#525252"
+                  />
+                  <Skeleton
+                    height={14}
+                    width="60%"
+                    baseColor="#313131"
+                    highlightColor="#525252"
+                  />
+                  <div className="flex gap-2 mt-3">
+                    <Skeleton
+                      height={20}
+                      width={40}
+                      borderRadius={10}
+                      baseColor="#313131"
+                      highlightColor="#525252"
+                    />
+                    <Skeleton
+                      height={20}
+                      width={60}
+                      borderRadius={10}
+                      baseColor="#313131"
+                      highlightColor="#525252"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
-}
-
+    );
+  }
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -110,7 +143,9 @@ function Dashboard() {
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-950 sticky top-0 z-10">
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight">{currentTeam.name}</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">
+                {currentTeam.name}
+              </h1>
               <p className="text-sm text-gray-400">Team dashboard</p>
             </div>
             <div className="flex gap-2">
@@ -159,7 +194,9 @@ function Dashboard() {
                   key={status}
                   className="w-full sm:w-1/2 lg:w-1/3 bg-gray-800 rounded-xl shadow-xl p-4 flex flex-col max-h-[80vh] overflow-y-auto custom-scrollbar"
                 >
-                  <h2 className="text-lg font-bold mb-4 text-white border-b border-gray-600 pb-1">{status}</h2>
+                  <h2 className="text-lg font-bold mb-4 text-white border-b border-gray-600 pb-1">
+                    {status}
+                  </h2>
                   <div className="flex flex-col gap-4">
                     {tasksByStatus[status].length > 0 ? (
                       tasksByStatus[status].map((task) => (
@@ -167,7 +204,10 @@ function Dashboard() {
                           key={task._id}
                           className="cursor-grab transition-all duration-200 transform hover:scale-[1.02]"
                         >
-                          <TaskCard task={task} />
+                          <TaskCard
+                            task={task}
+                            onClick={() => setTaskToEdit(task)}
+                          />
                         </div>
                       ))
                     ) : (
@@ -180,10 +220,17 @@ function Dashboard() {
         </div>
 
         {/* Modal */}
-        {showCreateModal && (
+        {/* Task Create/Edit Modal */}
+        {(showCreateModal || taskToEdit) && (
           <CreateTaskModal
-            onClose={() => setShowCreateModal(false)}
+            taskToEdit={taskToEdit}
+            onClose={() => {
+              setShowCreateModal(false);
+              setTaskToEdit(null);
+            }}
             onSuccess={() => {
+              setShowCreateModal(false);
+              setTaskToEdit(null);
               dispatch(
                 fetchTasksByTeamThunk({
                   token: localStorage.getItem("token"),

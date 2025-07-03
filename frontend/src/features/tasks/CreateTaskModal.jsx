@@ -1,11 +1,10 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTeamByIdThunk } from "../teams/teamSlice";
-import { createTaskThunk } from "./taskSlice";
+import { createTaskThunk, updateTaskThunk } from "./taskSlice";
 import { toast } from "react-toastify";
 
 const schema = z.object({
@@ -18,24 +17,17 @@ const schema = z.object({
   labels: z.string().optional(),
 });
 
-export default function CreateTaskModal({ onClose, onSuccess }) {
+export default function CreateTaskModal({ onClose, onSuccess, taskToEdit }) {
   const { token, user } = useSelector((state) => state.auth);
-
   const { currentTeam } = useSelector((state) => state.team);
-
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (currentTeam?._id) {
-      dispatch(fetchTeamByIdThunk({ token, teamId: currentTeam._id }));
-    }
-  }, [dispatch, token, currentTeam?._id]);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -44,24 +36,46 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
     },
   });
 
+  useEffect(() => {
+    if (currentTeam?._id) {
+      dispatch(fetchTeamByIdThunk({ token, teamId: currentTeam._id }));
+    }
+  }, [dispatch, token, currentTeam?._id]);
+
+  useEffect(() => {
+    if (taskToEdit) {
+      setValue("title", taskToEdit.title || "");
+      setValue("description", taskToEdit.description || "");
+      setValue("dueDate", taskToEdit.dueDate?.slice(0, 10) || "");
+      setValue("priority", taskToEdit.priority || "Medium");
+      setValue("status", taskToEdit.status || "To Do");
+      setValue("assignee", taskToEdit.assignee || "");
+      setValue("labels", taskToEdit.labels?.join(", ") || "");
+    }
+  }, [taskToEdit, setValue]);
+
   const onSubmit = async (data) => {
+    const labelsArray = data.labels
+      ? data.labels.split(",").map((l) => l.trim()).filter(Boolean)
+      : [];
+
     const taskData = {
       ...data,
+      labels: labelsArray,
       team: currentTeam._id,
       reporter: user._id,
-      labels: data.labels
-        ? data.labels
-            .split(",")
-            .map((l) => l.trim())
-            .filter(Boolean)
-        : [],
     };
 
     try {
-      await dispatch(createTaskThunk({ token, taskData })).unwrap();
-      toast.success("Task created!");
-      reset();
+      if (taskToEdit) {
+        await dispatch(updateTaskThunk({ token, taskId: taskToEdit._id, taskData })).unwrap();
+        toast.success("Task updated!");
+      } else {
+        await dispatch(createTaskThunk({ token, taskData })).unwrap();
+        toast.success("Task created!");
+      }
       onSuccess?.();
+      reset();
       onClose();
     } catch (err) {
       toast.error(err);
@@ -71,7 +85,9 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-gray-900 text-white rounded-lg p-6 w-full max-w-2xl shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Create New Task</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          {taskToEdit ? "Edit Task" : "Create New Task"}
+        </h2>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -89,10 +105,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
 
           <div>
             <label>Status</label>
-            <select
-              {...register("status")}
-              className="w-full p-2 mt-1 rounded bg-gray-800 border border-gray-700"
-            >
+            <select {...register("status")} className="w-full p-2 mt-1 rounded bg-gray-800 border border-gray-700">
               <option value="To Do">To Do</option>
               <option value="In Progress">In Progress</option>
               <option value="Done">Done</option>
@@ -101,10 +114,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
 
           <div>
             <label>Priority</label>
-            <select
-              {...register("priority")}
-              className="w-full p-2 mt-1 rounded bg-gray-800 border border-gray-700"
-            >
+            <select {...register("priority")} className="w-full p-2 mt-1 rounded bg-gray-800 border border-gray-700">
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
@@ -113,10 +123,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
 
           <div>
             <label>Assignee</label>
-            <select
-              {...register("assignee")}
-              className="w-full p-2 mt-1 rounded bg-gray-800 border border-gray-700"
-            >
+            <select {...register("assignee")} className="w-full p-2 mt-1 rounded bg-gray-800 border border-gray-700">
               {currentTeam.members?.map((m) => (
                 <option key={m._id} value={m._id}>
                   {m.name}
@@ -153,19 +160,11 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           </div>
 
           <div className="col-span-2 flex justify-end gap-2 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded"
-            >
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded">
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded"
-            >
-              {isSubmitting ? "Creating..." : "Create Task"}
+            <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">
+              {isSubmitting ? (taskToEdit ? "Updating..." : "Creating...") : taskToEdit ? "Update Task" : "Create Task"}
             </button>
           </div>
         </form>

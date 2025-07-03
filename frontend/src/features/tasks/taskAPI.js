@@ -9,9 +9,21 @@ export const createTask = async (token, taskData) => {
   return res.data;
 };
 
+export const updateTask = async (token, taskId, taskData) => {
+  const res = await axios.patch(`${BASE_URL}/tasks/${taskId}`, taskData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+
 export const fetchTasksByTeam = async (token, teamId) => {
   const res = await axios.get(`${BASE_URL}/tasks/team/${teamId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
+
+

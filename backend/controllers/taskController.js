@@ -47,3 +47,23 @@ exports.getTasksByTeam = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.updateTask = async (req, res) => {
+  const { taskId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+
+    if (task.reporter.toString() !== userId) {
+      return res.status(403).json({ message: 'Only reporter can edit this task' });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(taskId, req.body, { new: true });
+    res.json(updatedTask);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
