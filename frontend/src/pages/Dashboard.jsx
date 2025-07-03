@@ -195,8 +195,9 @@ function Dashboard() {
                   className="w-full sm:w-1/2 lg:w-1/3 bg-gray-800 rounded-xl shadow-xl p-4 flex flex-col max-h-[80vh] overflow-y-auto custom-scrollbar"
                 >
                   <h2 className="text-lg font-bold mb-4 text-white border-b border-gray-600 pb-1">
-                    {status}
-                  </h2>
+  {status} ({tasksByStatus[status].length})
+</h2>
+
                   <div className="flex flex-col gap-4">
                     {tasksByStatus[status].length > 0 ? (
                       tasksByStatus[status].map((task) => (
